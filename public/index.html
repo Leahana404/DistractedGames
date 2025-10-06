@@ -1,62 +1,77 @@
 ```html
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Party Platform</title>
+<title>Party Platform — Home</title>
 <link rel="stylesheet" href="/style.css" />
+<style>
+.hero { text-align:center; padding: 16px 0 4px; }
+.grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+</style>
 </head>
 <body>
 <main class="container">
+<div class="hero">
 <h1>Party Platform</h1>
-<div class="card">
-<h2>Create a Room (Host)</h2>
-<button id="createRoomBtn" class="btn primary">Create Room</button>
-<div id="createStatus" class="status"></div>
+<div class="status">Play on your phone. Everyone sees the main screen + their own controls.</div>
 </div>
 
 
-<div class="card">
-<h2>Join a Room</h2>
-<label>Room Code
-<input id="roomCodeInput" maxlength="4" placeholder="ABCD" />
-</label>
-<label>Name
-<input id="nameInput" maxlength="24" placeholder="Your name" />
-</label>
-<a id="joinLink" class="btn" href="#">Join</a>
-<div class="status">Tip: You’ll see the main screen **and** your controls on the same page.</div>
+<div class="grid">
+<section class="card">
+<h2>Host a New Game</h2>
+<p>Create a room on this device. You’ll get host controls.</p>
+<button id="hostBtn" class="btn primary" aria-label="Host a new game">Host New Game</button>
+</section>
+
+
+<section class="card">
+<h2>Join a Game</h2>
+<label for="code">Room Code</label>
+<input id="code" maxlength="4" placeholder="ABCD" autocomplete="one-time-code" />
+<label for="name">Your Name</label>
+<input id="name" maxlength="24" placeholder="Your name" />
+<div class="row">
+<button id="joinBtn" class="btn" aria-label="Join game">Join Game</button>
+</div>
+<div id="msg" class="status"></div>
+</section>
 </div>
 </main>
 
 
 <script>
-const createBtn = document.getElementById('createRoomBtn');
-const createStatus = document.getElementById('createStatus');
-const joinLink = document.getElementById('joinLink');
-const codeInput = document.getElementById('roomCodeInput');
-const nameInput = document.getElementById('nameInput');
+const el = (id) => document.getElementById(id);
+const hostBtn = el('hostBtn');
+const joinBtn = el('joinBtn');
+const code = el('code');
+const name = el('name');
+const msg = el('msg');
 
 
-createBtn?.addEventListener('click', async () => {
-// Use a tiny fetch to get socket script preloaded on app page
+// Prefill from localStorage
+try { name.value = localStorage.getItem('pp:name') || ''; } catch {}
+
+
+hostBtn.addEventListener('click', () => {
+// Route to unified app which will create & show host controls
 window.location.href = '/app.html?host=1';
 });
 
 
-joinLink?.addEventListener('click', () => {
-const code = (codeInput.value||'').trim().toUpperCase();
-const name = (nameInput.value||'').trim();
-if (code.length !== 4) {
-alert('Enter a 4-letter code');
-return;
-}
+function join() {
+const c = (code.value||'').trim().toUpperCase();
+const n = (name.value||'').trim();
+if (c.length !== 4) { msg.textContent = 'Enter a 4-letter room code'; code.focus(); return; }
+try { localStorage.setItem('pp:name', n); } catch {}
 const url = new URL('/app.html', window.location.origin);
-url.searchParams.set('code', code);
-if (name) url.searchParams.set('name', name);
+url.searchParams.set('code', c);
+if (n) url.searchParams.set('name', n);
 window.location.href = url.toString();
-});
+}
+
+
+joinBtn.addEventListener('click', join);
+code.addEventListener('keyup', (e) => { code.value = code.value.toUpperCase(); if (e.key==='Enter') join(); });
+name.addEventListener('keyup', (e) => { if (e.key==='Enter') join(); });
 </script>
 </body>
 </html>
