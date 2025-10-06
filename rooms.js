@@ -1,5 +1,4 @@
 ```js
-room.state.prompt = null;
 room.state.durationMs = 0;
 room.state.roundEndsAt = null;
 room.state.submissions = new Map();
