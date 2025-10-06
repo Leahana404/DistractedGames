@@ -1,0 +1,79 @@
+```html
+socket.emit('player:joinRoom', { code, name }, (res) => {
+if (!res?.ok) return joinStatus.textContent = res.error || 'Failed to join';
+myRole = 'player';
+myCode = code;
+roomCodeEl.textContent = code;
+joinArea.classList.add('hidden');
+playerControls.classList.remove('hidden');
+joinStatus.textContent = '';
+setPhase(res.state.phase || 'lobby');
+});
+});
+
+
+createBtn.addEventListener('click', () => {
+socket.emit('host:createRoom', {}, (res) => {
+if (!res?.ok) return alert(res?.error || 'Failed to create room');
+myRole = 'host';
+myCode = res.code;
+roomCodeEl.textContent = res.code;
+joinArea.classList.add('hidden');
+playerControls.classList.remove('hidden');
+hostControls.classList.remove('hidden');
+setPhase(res.state?.phase || 'lobby');
+});
+});
+
+
+// Player submit
+submitBtn.addEventListener('click', () => {
+const answer = (answerInput.value||'').trim();
+if (!answer) return;
+socket.emit('player:submitAnswer', { answer }, (res) => {
+if (res?.ok) {
+submitBtn.disabled = true;
+}
+});
+});
+
+
+// Socket listeners
+socket.on('room:update', (state) => {
+if (!state) return;
+setPhase(state.phase || 'lobby');
+setPlayers(state.players || []);
+});
+
+
+socket.on('round:started', handleRoundStarted);
+socket.on('round:progress', ({ submitted, totalPlayers }) => {
+mainCountdown.textContent += ` — Submitted: ${submitted}/${totalPlayers}`;
+});
+socket.on('round:ended', handleRoundEnded);
+socket.on('round:reset', ({ phase }) => {
+setPhase(phase || 'lobby');
+revealArea.classList.add('hidden');
+mainPrompt.textContent = '—';
+mainCountdown.textContent = '';
+playerCountdown.textContent = '';
+});
+
+
+socket.on('room:closed', () => {
+alert('The host closed the room.');
+window.location.href = '/';
+});
+
+
+// Convenience: prefill from URL (join or host)
+(function bootstrap(){
+if (preCode) joinCode.value = preCode;
+if (preName) joinName.value = preName;
+if (wantHost) {
+createBtn.click();
+} else if (preCode) {
+joinBtn.click();
+}
+})();
+```
