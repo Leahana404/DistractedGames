@@ -1,4 +1,7 @@
 ```js
+socket.data.name = name;
+cb?.({ ok: true, state: rooms.publicState(code) });
+io.to(code).emit('room:update', rooms.publicState(code));
 });
 
 
@@ -73,6 +76,3 @@ io.to(code).emit('room:update', rooms.publicState(code));
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Unified jackbox-lite on http://localhost:${PORT}`));
 ```
-
-
----
