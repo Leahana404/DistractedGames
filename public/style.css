@@ -32,21 +32,3 @@ li { padding: 6px 0; border-bottom: 1px dashed #263042; }
 .status { opacity: 0.9; margin-top: 8px; font-size: 0.95rem; }
 .hidden { display: none !important; }
 ```
-
-
----
-
-
-## How to run locally
-```bash
-npm install
-npm run start
-
-
-# Open landing page
-http://localhost:3000/
-
-
-# Create (host) -> takes you to /app.html?host=1
-# Or Join with code/name -> /app.html?code=ABCD&name=YourName
-```
