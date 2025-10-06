@@ -1,0 +1,63 @@
+```html
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Party Platform</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<main class="container">
+<h1>Party Platform</h1>
+<div class="card">
+<h2>Create a Room (Host)</h2>
+<button id="createRoomBtn" class="btn primary">Create Room</button>
+<div id="createStatus" class="status"></div>
+</div>
+
+
+<div class="card">
+<h2>Join a Room</h2>
+<label>Room Code
+<input id="roomCodeInput" maxlength="4" placeholder="ABCD" />
+</label>
+<label>Name
+<input id="nameInput" maxlength="24" placeholder="Your name" />
+</label>
+<a id="joinLink" class="btn" href="#">Join</a>
+<div class="status">Tip: You’ll see the main screen **and** your controls on the same page.</div>
+</div>
+</main>
+
+
+<script>
+const createBtn = document.getElementById('createRoomBtn');
+const createStatus = document.getElementById('createStatus');
+const joinLink = document.getElementById('joinLink');
+const codeInput = document.getElementById('roomCodeInput');
+const nameInput = document.getElementById('nameInput');
+
+
+createBtn?.addEventListener('click', async () => {
+// Use a tiny fetch to get socket script preloaded on app page
+window.location.href = '/app.html?host=1';
+});
+
+
+joinLink?.addEventListener('click', () => {
+const code = (codeInput.value||'').trim().toUpperCase();
+const name = (nameInput.value||'').trim();
+if (code.length !== 4) {
+alert('Enter a 4-letter code');
+return;
+}
+const url = new URL('/app.html', window.location.origin);
+url.searchParams.set('code', code);
+if (name) url.searchParams.set('name', name);
+window.location.href = url.toString();
+});
+</script>
+</body>
+</html>
+```
